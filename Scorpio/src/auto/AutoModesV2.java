@@ -1,17 +1,22 @@
 package auto;
 
 import org.usfirst.frc.team20.robot.Scorpio;
-import org.usfirst.frc.team20.robot.Team20Libraries.T20Command;
 import org.usfirst.frc.team20.robot.Team20Libraries.T20Node;
 import org.usfirst.frc.team20.robot.Team20Libraries.T20ParallelNode;
 import org.usfirst.frc.team20.robot.Team20Libraries.T20SeriesNode;
 
+import autoCommands.T20AutoCommandArcTurnToAngle;
 import autoCommands.T20AutoCommandDelaySeconds;
 import autoCommands.T20AutoCommandDoNothing;
 import autoCommands.T20AutoCommandDriveStraightFeetLeft;
 import autoCommands.T20AutoCommandDriveStraightFeetRight;
+import autoCommands.T20AutoCommandDriveTimeNotStraight;
+import autoCommands.T20AutoCommandDriveTimeRightMoarPower;
+import autoCommands.T20AutoCommandDriveTimeRightSide;
+import autoCommands.T20AutoCommandFlywheelStahp;
 import autoCommands.T20AutoCommandFlywheelToSpeed;
 import autoCommands.T20AutoCommandHoodTo610Position;
+import autoCommands.T20AutoCommandHoodToAlmostHome;
 import autoCommands.T20AutoCommandHoodToLowPosition;
 import autoCommands.T20AutoCommandHoodToOuterworksPosition;
 import autoCommands.T20AutoCommandHoodToSafePosition;
@@ -27,6 +32,7 @@ import autoCommands.T20AutoCommandToggleLance;
 import autoCommands.T20AutoCommandTomahawksDown;
 import autoCommands.T20AutoCommandTomahawksUp;
 import autoCommands.T20AutoCommandTurnToAngle;
+import autoCommands.T20AutoCommandWaitForBall;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class AutoModesV2 extends Scorpio {
@@ -98,12 +104,13 @@ public class AutoModesV2 extends Scorpio {
 
 	private void createAutoBotsTransformConceal() {
 		concealTree = new T20SeriesNode();
-		concealTree.addChild(new T20AutoCommandHoodToSafePosition());
+		T20Node upTree = new T20ParallelNode();
+		upTree.addChild(new T20AutoCommandTomahawksUp());
+		upTree.addChild(new T20AutoCommandHoodToSafePosition());
+		concealTree.addChild(upTree);
 		concealTree.addChild(new T20AutoCommandToggleLance());
-		T20Node secondaryTranformConceal = new T20ParallelNode();
-		secondaryTranformConceal.addChild(new T20AutoCommandLanceUp());
-		secondaryTranformConceal.addChild(new T20AutoCommandTomahawksUp());
-		concealTree.addChild(secondaryTranformConceal);
+		concealTree.addChild(new T20AutoCommandHoodToAlmostHome());
+		concealTree.addChild(new T20AutoCommandLanceUp());
 	}
 
 	/**
@@ -198,11 +205,10 @@ public class AutoModesV2 extends Scorpio {
 	 */
 	public void createAuto(String mode) {
 		mainAuto = new T20SeriesNode();
-		mainAuto.addChild(new T20AutoCommandLanceWatchDog());
 		switch (mode) {
 		case "nothing":
 			createNothing();
-			mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(-.4, 2));
+			mainAuto.addChild(doNothingNode);
 			break;
 		case "pos1cross":
 			createAutoBotsTransformRollOut();
@@ -225,10 +231,6 @@ public class AutoModesV2 extends Scorpio {
 			mainAuto.addChild(new T20AutoCommandToggleLance());
 			mainAuto.addChild(new T20AutoCommandLanceDown());
 			mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(-.5, 14));
-			mainAuto.addChild(new T20AutoCommandIntakeWaitForBall());
-			if (DriverStation.getInstance().getMatchTime() > 5 && indexer.getIndexerBumpSwitch()) {
-				mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(1, 14));
-			}
 			break;
 		case "pos2battershot":
 
@@ -238,29 +240,79 @@ public class AutoModesV2 extends Scorpio {
 			mainAuto.addChild(batterAutoPos3Node);
 			break;
 		case "pos4battershot":
-
+			mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(.6, 14));
+			mainAuto.addChild(new T20AutoCommandTurnToAngle(-7));
+			mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(.5, 2.8));
+			T20Node startShot4 = new T20ParallelNode();
+			createAutoBotsTransformRollOut();
+			startShot4.addChild(rollOutTree);
+			startShot4.addChild(new T20AutoCommandFlywheelToSpeed(flywheel.FLYSPEED_OUTERWORKS));
+			mainAuto.addChild(startShot4);
+			mainAuto.addChild(new T20AutoCommandHoodTo610Position());
+			mainAuto.addChild(new T20AutoCommandIntakeIntake());
 			break;
 		case "pos5battershot":
 			mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(.8, 11));
 			mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(.5, 10));
 			mainAuto.addChild(new T20AutoCommandTurnToAngle(-25));
 			mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(.4, .5));
-			T20Node startShot = new T20ParallelNode();
+			T20Node startShot5 = new T20ParallelNode();
 			createAutoBotsTransformRollOut();
-			startShot.addChild(rollOutTree);
-			startShot.addChild(new T20AutoCommandFlywheelToSpeed(flywheel.FLYSPEED_OUTERWORKS));
-			mainAuto.addChild(startShot);
+			startShot5.addChild(rollOutTree);
+			startShot5.addChild(new T20AutoCommandFlywheelToSpeed(flywheel.FLYSPEED_OUTERWORKS));
+			mainAuto.addChild(startShot5);
 			mainAuto.addChild(new T20AutoCommandHoodTo610Position());
 			mainAuto.addChild(new T20AutoCommandIntakeIntake());
 			break;
 		case "pos3outerworksshot":
-
+			mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(.6, 14));
+			mainAuto.addChild(new T20AutoCommandTurnToAngle(-6));
+			mainAuto.addChild(new T20AutoCommandDriveStraightFeetLeft(.5, 2.5));
+			mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(.5, 2.8));
+			mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(-.2, 2));
+			T20Node startShot6 = new T20ParallelNode();
+			createAutoBotsTransformRollOut();
+			startShot6.addChild(rollOutTree);
+			startShot6.addChild(new T20AutoCommandFlywheelToSpeed(flywheel.FLYSPEED_OUTERWORKS));
+			mainAuto.addChild(startShot6);
+			mainAuto.addChild(new T20AutoCommandHoodTo610Position());
+			mainAuto.addChild(new T20AutoCommandIntakeIntake());
 			break;
 		case "pos4outerworksshot":
-
+			createAutoBotsTransformRollOut();
+			createAutoBotsTransformConceal();
+			mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(.6, .3));
+			T20Node startShot7 = new T20ParallelNode();
+			startShot7.addChild(new T20AutoCommandLanceWatchDog());
+			startShot7.addChild(rollOutTree);
+			startShot7.addChild(new T20AutoCommandLanceWatchDog());
+			startShot7.addChild(new T20AutoCommandFlywheelToSpeed(flywheel.FLYSPEED_OUTERWORKS));
+			mainAuto.addChild(startShot7);
+			mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(-.5, .3));
+			mainAuto.addChild(new T20AutoCommandHoodToOuterworksPosition());
+			mainAuto.addChild(new T20AutoCommandDelaySeconds(.1));
+			mainAuto.addChild(new T20AutoCommandIntakeIntake());
+			mainAuto.addChild(new T20AutoCommandWaitForBall());
+			mainAuto.addChild(new T20AutoCommandDelaySeconds(1));
+			mainAuto.addChild(new T20AutoCommandFlywheelStahp(0));
+			mainAuto.addChild(new T20AutoCommandIntakeStop());
+			mainAuto.addChild(new T20AutoCommandTomahawksUp());
+			mainAuto.addChild(new T20AutoCommandHoodToAlmostHome());
+			mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(.5, .4));
+			mainAuto.addChild(new T20AutoCommandDriveTimeRightSide(1, .9));
+			// mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(.6, 1));
+			// The BackUp
+			mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(-.6, 1.6));
+			mainAuto.addChild(new T20AutoCommandTomahawksDown());
+			// mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(-.6,
+			// 1.5));
+			mainAuto.addChild(new T20AutoCommandDriveTimeRightMoarPower(-.6, -.7, 1));
+			mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(-.6, 1.4));
+			mainAuto.addChild(new T20AutoCommandDriveTimeNotStraight(.6, 4));
+			ahrs.ahrs.getAngle();
+			mainAuto.addChild(new T20AutoCommandTurnToAngle(-5));
 			break;
 		case "pos5steal":
-
 			break;
 
 		default:
@@ -268,7 +320,6 @@ public class AutoModesV2 extends Scorpio {
 			mainAuto.addChild(doNothingNode);
 			break;
 		}
-		mainAuto.addChild(new T20AutoCommandRobotShutdown());
 	}
 
 	/**
@@ -280,4 +331,5 @@ public class AutoModesV2 extends Scorpio {
 	public void executeMainAuto() {
 		mainAuto.execute();
 	}
+
 }

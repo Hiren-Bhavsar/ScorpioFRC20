@@ -20,8 +20,8 @@ public class T20AutoCommandToggleLance extends Scorpio implements T20Command {
 		if (!isStarted) {
 			System.out.println("<Lance Is Toggling>");
 			isStarted = !isStarted;
+			lance.toggleLance();
 		}
-		lance.toggleLance();
 		this.isFinished = true;
 		System.out.println("</Lance Is Toggling>");
 

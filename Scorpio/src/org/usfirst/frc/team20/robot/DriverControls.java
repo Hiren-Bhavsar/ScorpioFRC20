@@ -2,6 +2,7 @@ package org.usfirst.frc.team20.robot;
 
 import org.usfirst.frc.team20.robot.Team20Libraries.T20GamePad;
 
+import edu.wpi.first.wpilibj.Timer;
 import subsystems.Drivetrain.driveModes;
 
 public class DriverControls extends Scorpio {
@@ -10,14 +11,52 @@ public class DriverControls extends Scorpio {
 
 	private double heading = 0;
 	private boolean navXOn = true;
+	private boolean flashToggler, triToggle = false;
+	private Timer flashTimer = new Timer();
 
 	public DriverControls() {
-		driverJoy.leftStickTolerance = .1;
 	}
 
 	private long mills = 0;
 
 	public void driverControls() {
+
+		if (driverJoy.getOneShotButtonA()) {
+			if (flashToggler) {
+				flashA_AH.flashlightOff();
+				flashToggler = false;
+			} else {
+				flashA_AH.flashlightOn();
+				flashToggler = true;
+			}
+		}
+
+		if (driverJoy.getOneShotButtonY()) {
+			triToggle = true;
+			flashTimer.start();
+		}
+		if (triToggle) {
+			if (flashTimer.get() > 0 && flashTimer.get() < .2) {
+				flashA_AH.flashlightOn();
+			}
+			if (flashTimer.get() > .2 && flashTimer.get() < .4) {
+				flashA_AH.flashlightOff();
+			}
+			if (flashTimer.get() > .4 && flashTimer.get() < .6) {
+				flashA_AH.flashlightOn();
+			}
+			//
+			if (flashTimer.get() > .6 && flashTimer.get() < .8) {
+				flashA_AH.flashlightOff();
+			}
+			if (flashTimer.get() > .8 && flashTimer.get() < 1) {
+				flashA_AH.flashlightOn();
+				flashTimer.stop();
+				flashTimer.reset();
+				flashToggler = true;
+				triToggle = false;
+			}
+		}
 		System.out.println(
 				"One side " + drivetrain.getLeftSideEncVal() + " other side " + drivetrain.getRightSideEncVal());
 

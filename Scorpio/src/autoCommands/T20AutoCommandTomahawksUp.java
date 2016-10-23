@@ -21,10 +21,11 @@ public class T20AutoCommandTomahawksUp extends Scorpio implements T20Command {
 			System.out.println("<Tomahawks Are Moving Up>");
 			isStarted = !isStarted;
 		}
-		tomahawks.retractTomahawks();
 		System.out.println("</Tomahawks Are Moving Up>");
-		this.isFinished = true;
-
+		tomahawks.retractTomahawks();
+		if (isStarted) {
+			this.isFinished = true;
+		}
 	}
 
 	@Override

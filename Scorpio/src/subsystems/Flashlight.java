@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.Relay;
 
 public class Flashlight {
 
-	Relay flashlightSpike = new Relay(Constants.FLASHLIGHT_SPIKE_PORT);
+	private Relay flashlightSpike = new Relay(Constants.FLASHLIGHT_SPIKE_PORT);
 
 	public Flashlight() {
 

@@ -26,9 +26,9 @@ public class Robot extends IterativeRobot {
 		autoChooser.addDefault("Position 3 Batter Shot", "pos3battershot");
 		autoChooser.addDefault("Position 4 Batter Shot", "pos4battershot");
 		autoChooser.addDefault("Position 5 Batter Shot", "pos5battershot");
-		autoChooser.addDefault("Position 3 Outerworks Shot", "pos3outerworksshot");
-		autoChooser.addDefault("Position 4 Outerworks Shot", "pos4outerworksshot");
-		autoChooser.addDefault("Position 5 Steal Auto", "pos5steal");
+		autoChooser.addDefault("Position 4 Smash Bros", "pos3outerworksshot");
+		autoChooser.addDefault("Spy Box Auto Reach/Cross", "pos4outerworksshot");
+		autoChooser.addDefault("Spy Box Only", "pos5steal");
 		SmartDashboard.putData("Auto Modes:", autoChooser);
 		SmartDashboard.putBoolean(" Collector", false);
 		SmartDashboard.putDouble("Flywheel Speed ", Scorpio.flywheel.getSpeed());
@@ -66,6 +66,7 @@ public class Robot extends IterativeRobot {
 
 	public void autonomousPeriodic() {
 		Scorpio.vision.vision.processImage();
+		Scorpio.lance.lanceMovementWatchDog();
 		Scorpio.autoModes.executeMainAuto();
 		smartDashboardUpdater();
 	}

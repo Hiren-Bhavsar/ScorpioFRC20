@@ -180,6 +180,18 @@ public class Drivetrain extends Scorpio {
 		// drivetrainHeadingPID.setPID(p, i, d);
 	}
 
+	public void driveRightSideOnly(double speed) {
+		masterRight.set(-speed);
+		followerRight.set(Constants.DRIVETRAIN_MASTER_RIGHT_MOTOR_PORT);
+	}
+
+	public void driveRightMoar(double speedRight, double speedLeft) {
+		masterLeft.set(speedLeft);
+		followerLeft.set(Constants.DRIVETRAIN_MASTER_LEFT_MOTOR_PORT);
+		masterRight.set(-speedRight);
+		followerRight.set(Constants.DRIVETRAIN_MASTER_RIGHT_MOTOR_PORT);
+	}
+
 	public double getHeading() {
 		return ahrs.ahrs.getAngle();
 	}

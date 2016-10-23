@@ -21,7 +21,6 @@ public class T20AutoCommandIntakeStop extends Scorpio implements T20Command {
 			System.out.println("<Intakes Are Stopping>");
 			isStarted = !isStarted;
 		}
-		lance.stopIntake();
 		indexer.stopIndexer();
 		System.out.println("</Intakes Are Stopping>");
 		this.isFinished = true;

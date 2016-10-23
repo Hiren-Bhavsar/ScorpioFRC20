@@ -9,6 +9,7 @@ public class OperatorControls extends Scorpio {
 	protected T20GamePad operatorJoy = new T20GamePad(T20GamePad.JS_TYPE_XBOX, 1);
 	public double flyspeedHolder = 0, hoodPositonHolder = 0;
 	private boolean hoodHelper = false;
+	private boolean isBatterShotting = false;
 
 	public OperatorControls() {
 
@@ -50,13 +51,20 @@ public class OperatorControls extends Scorpio {
 			lance.backDrive();
 			indexer.backdriveIndexer();
 		}
+
+		if (operatorJoy.getOneShotButtonLS()) {
+			flyspeedHolder = flywheel.FLYSPEED_DEMO;
+			hoodPositonHolder = hood.HOOD_POS_DEMO;
+		}
 		// END COLLECTOR CONTROL
 
 		// FLYWHEEL CONTROL
 		if (operatorJoy.getOneShotButtonBack()) {
+			isBatterShotting = false;
 			lance.stopIntake();
 			indexer.stopIndexer();
 			flyspeedHolder = flywheel.FLYSPEED_STOP;
+			hoodHelper = true;
 		}
 
 		if (operatorJoy.getOneShotButtonStart()) {
@@ -78,21 +86,31 @@ public class OperatorControls extends Scorpio {
 		// Hood CONTROL
 
 		if (operatorJoy.getPOV() == 270) {
+			isBatterShotting = false;
 			if (hood.hoodIsActuallyHomed)
 				hoodPositonHolder = hood.HOOD_POS_OUTERWORKS;
 			flyspeedHolder = flywheel.FLYSPEED_OUTERWORKS;
 		}
-		if (operatorJoy.getPOV() == 90) {
-			if (hood.hoodIsActuallyHomed)
-				hoodPositonHolder = hood.HOOD_POS_BATTER;
-			flyspeedHolder = flywheel.FLYSPEED_BATTER;
+		if (operatorJoy.getPOV() == 90 || isBatterShotting) {
+			isBatterShotting = true;
+			if (hood.hoodIsActuallyHomed) {
+				if (tomahawks.getBatterTomahawk()) {
+					hoodPositonHolder = hood.HOOD_POS_BATTER_TOMAHAWKS;
+					flyspeedHolder = flywheel.FLYSPEED_BATTER_TOMAHAWKS;
+				} else {
+					hoodPositonHolder = hood.HOOD_POS_BATTER;
+					flyspeedHolder = flywheel.FLYSPEED_BATTER;
+				}
+			}
 		}
 		if (operatorJoy.getPOV() == 0) {
+			isBatterShotting = false;
 			if (hood.hoodIsActuallyHomed)
 				hoodPositonHolder = hood.HOOD_POS_THE_6;
 			flyspeedHolder = flywheel.FLYSPEED_OUTERWORKS;
 		}
 		if (operatorJoy.getPOV() == 180) {
+			isBatterShotting = false;
 			hoodHelper = true;
 			flyspeedHolder = flywheel.FLYSPEED_STOP;
 		}
@@ -117,13 +135,6 @@ public class OperatorControls extends Scorpio {
 		// SET FLYWHEEL SPEED
 
 		flywheel.flywheelToSpeed(flyspeedHolder);
-
-		// FLASHLIGHT CONTROL
-		if (flyspeedHolder > 0) {
-			flashA_AH.flashlightOn();
-		} else {
-			flashA_AH.flashlightOff();
-		}
 
 		// SET HOOD POSITION
 		if (drivetrain.driveMode != driveModes.CAMERA_TARGET && hood.hoodIsActuallyHomed

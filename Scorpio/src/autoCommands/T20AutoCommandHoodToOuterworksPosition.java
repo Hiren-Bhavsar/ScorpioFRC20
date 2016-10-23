@@ -21,8 +21,8 @@ public class T20AutoCommandHoodToOuterworksPosition extends Scorpio implements T
 			System.out.println("<Hood Moving To Outerworks Position>");
 			isStarted = !isStarted;
 		}
-		hood.moveHoodPositon(hood.HOOD_POS_OUTERWORKS);
-		if (Math.abs(hood.getHoodEnc() - hood.HOOD_POS_OUTERWORKS) < 800) {
+		hood.moveHoodPositon(hood.HOOD_POS_OUTERWORKS - 7600);
+		if (Math.abs(hood.getHoodEnc() - (hood.HOOD_POS_OUTERWORKS - 7600)) < 2000) {
 			System.out.println("</Hood Moving To Outerworks Position>");
 			this.isFinished = true;
 		}

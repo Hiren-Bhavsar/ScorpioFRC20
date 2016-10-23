@@ -5,15 +5,16 @@ import org.usfirst.frc.team20.robot.Team20Libraries.T20Command;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class T20AutoCommandDelaySeconds extends Scorpio implements T20Command {
+public class T20AutoCommandDriveTimeNotStraight extends Scorpio implements T20Command {
 	private boolean isFinished, isStarted;
 	private double speed, time, heading;
 	private Timer driveTimer = new Timer();
 
-	public T20AutoCommandDelaySeconds(double time) {
+	public T20AutoCommandDriveTimeNotStraight(double speed, double time) {
 		this.isFinished = false;
 		this.isStarted = false;
 		this.time = time;
+		this.speed = -speed;
 	}
 
 	@Override
@@ -23,13 +24,16 @@ public class T20AutoCommandDelaySeconds extends Scorpio implements T20Command {
 		}
 
 		if (!isStarted) {
-			System.out.println("<Delay: " + " For Time: " + this.time + ">");
-			driveTimer.start();
+			System.out.println("<Drive Straight At Speed: " + this.speed + " For Time: " + this.time + ">");
+			drivetrain.setRobotCentric();
 			isStarted = !isStarted;
+			driveTimer.start();
 		}
 		if (driveTimer.get() < this.time) {
-		} else if (driveTimer.get() >= this.time) {
-			System.out.println("</Delay: " + " For Time: " + this.time + ">");
+			drivetrain.drive(this.speed, 0);
+		} else if (driveTimer.get() > this.time) {
+			drivetrain.drive(0, 0);
+			System.out.println("</Drive Straight At Speed: " + this.speed + " For Time: " + this.time + ">");
 			this.isFinished = true;
 		}
 	}
@@ -41,7 +45,7 @@ public class T20AutoCommandDelaySeconds extends Scorpio implements T20Command {
 
 	@Override
 	public T20Command copy() {
-		return new T20AutoCommandDelaySeconds(this.time);
+		return new T20AutoCommandDriveTimeNotStraight(this.speed, this.time);
 	}
 
 }
